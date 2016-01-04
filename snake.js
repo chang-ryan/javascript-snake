@@ -1,10 +1,10 @@
 var gameBoardSize = 40;
 var gamePoints = 0;
-var gameSpeed = 200;
+var gameSpeed = 100;
 
 $(document).ready(function() {
   console.log("Ready!");
-  render();
+  createBoard();
   gameLoop();
 });
 
@@ -14,7 +14,12 @@ var Snake = {
   direction: 'r'
 }
 
-function render() {
+var Food = {
+  position: [],
+  present: false
+}
+
+function createBoard() {
   $("#game-board").empty();
   var size = gameBoardSize;
 
@@ -27,7 +32,7 @@ function render() {
 }
 
 function moveSnake() {
-  var head = $.extend(true, [], Snake.position).shift();
+  var head = Snake.position[0].slice();
 
   switch (Snake.direction) {
     case 'r':
@@ -44,13 +49,37 @@ function moveSnake() {
       break;
   }
 
+  // draw head
   $(".row:nth-child(" + head[0] + ") > .pixel:nth-child(" + head[1] + ")").addClass("snake-pixel");
-  for (var i = 1; i < Snake.size; i++) {
+
+  // draw rest of body loop
+  for (var i = 0; i < Snake.size; i++) {
     $(".row:nth-child(" + Snake.position[i][0] + ") > .pixel:nth-child(" + Snake.position[i][1] + ")").addClass("snake-pixel");
   }
-  //Snake.position.unshift(head);
-  //$(".row:nth-child(" + Snake.position[Snake.size-1][0] + ") > .pixel:nth-child(" + Snake.position[Snake.size-1][1] + ")").removeClass("snake-pixel");
-  //Snake.position.pop();
+
+  // if head touches food
+  if (head.every(function(e,i) {
+    return e === Food.position[i];
+  })) {
+    Snake.size++;
+    Food.present = false;
+    gamePoints += 8;
+    $(".row:nth-child(" + Food.position[0] + ") > .pixel:nth-child(" + Food.position[1] + ")").removeClass("food-pixel");
+  } else {
+    $(".row:nth-child(" + Snake.position[Snake.size-1][0] + ") > .pixel:nth-child(" + Snake.position[Snake.size-1][1] + ")").removeClass("snake-pixel");
+    Snake.position.pop();
+  }
+
+  Snake.position.unshift(head);
+}
+
+function genFood() {
+  if (Food.present === false) {
+    Food.position = [Math.floor((Math.random()*40) + 1),Math.floor((Math.random()*40) + 1)]
+    Food.present = true;
+    console.log("Food at: "+Food.position);
+    $(".row:nth-child(" + Food.position[0] + ") > .pixel:nth-child(" + Food.position[1] + ")").addClass("food-pixel");
+  }
 }
 
 function getKey() {
@@ -73,16 +102,32 @@ function getKey() {
 }
 
 function gameLoop() {
-  getKey();
   setTimeout(function() {
+    getKey();
+    genFood();
     moveSnake();
-    //alive() ? gameLoop() : console.log("Game Over!");
-  }, gameSpeed)
+    alive() ? gameLoop() : console.log("Game Over!");
+  }, gameSpeed);
 }
 
 function alive() {
+  // wall collision
   if (Snake.position[0][0] < 1 || Snake.position[0][0] > 40 || Snake.position[0][1] < 1 || Snake.position[0][1] > 40) {
     return false;
   }
+  // self collision
+  for (var i = 1; i < Snake.size; i++) {
+    if ((Snake.position[0]).every(function(element,index) {
+      return element === Snake.position[i][index];
+    })) {
+      return false;
+    }
+  }
   return true;
+}
+
+function gameOver() {
+  setTimeout(function() {
+    $(".row:nth-child(" + Snake.position[0][0] + ") > .pixel:nth-child(" + Snake.position[0][1] + ")").toggleClass("snake-pixel");
+  }, 500);
 }

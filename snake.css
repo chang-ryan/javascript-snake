@@ -90,7 +90,9 @@ html {
   border-bottom: 1px solid #000;
   box-sizing: border-box;
 }
-
 .snake-pixel {
   background-color: #000;
+}
+.food-pixel {
+	background-color: blue;
 }
