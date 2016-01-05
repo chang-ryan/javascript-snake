@@ -13,12 +13,18 @@
 <body>
   <div class="container">
     <header class="title">
-      <h1>Ryan's JavaScript Snake</h1>
-      <h3>Score: </h3>
+      <h2>Ryan's JavaScript Snake</h2>
+      <h3 id="score">Score: </h3>
     </header>
   </div>
 
   <div class="container">
+    <section class="overlay">
+      <div class="game-over-grid">
+        <h3 id="game-over">You dead!</h3>
+      </div>
+      <button class="game-over-grid btn">Play</button>
+    </section>
     <section id="game-board">
     </section>
   </div>
