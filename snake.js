@@ -92,7 +92,7 @@ function genFood() {
 }
 
 function getKey() {
-  $(document).keydown(function(key) {
+  $(document).one("keydown", function(key) {
     switch(key.which) {
       case 37: // left arrow key
         if (Snake.direction != 'r') { Snake.direction = 'l'; }
